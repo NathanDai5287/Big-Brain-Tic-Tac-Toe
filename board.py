@@ -5,6 +5,18 @@ from move import Move
 # sys.stdout = open('stdout.out', 'w')
 
 class SubBoard:
+	x_win = np.array([
+			[1, 0, 1],
+			[0, 1, 0],
+			[1, 0, 1],
+		])
+
+	o_win = np.array([
+			[-1, -1, -1],
+			[-1, 0, -1],
+			[-1, -1, -1],
+		])
+
 	def __init__(self):
 		self.board = np.full((3, 3), None)
 
@@ -85,7 +97,10 @@ class Board:
 				move = Move(row=row, col=col)
 				(bigrow, bigcol), (subrow, subcol) = move.relative
 
-				value = self.value_map[self.subboards[bigrow, bigcol][subrow, subcol]]
+				if (self.board[bigrow, bigcol] is None):
+					value = self.value_map[self.subboards[bigrow, bigcol][subrow, subcol]]
+				else:
+					value = self.value_map[self.subboards[bigrow, bigcol].winner]
 
 				if (col % 3 == 0 and col != 0):
 					out += ' '
@@ -95,38 +110,6 @@ class Board:
 			out += '\n'
 
 		return out
-
-	# def possible_bigboard(self) -> set[tuple[int, int]]:
-	# 	"""finds the possible subboards to play in
-
-	# 	Returns:
-	# 			tuple[int, int]: coordinate of the big board
-	# 	"""
-
-	# 	if (self.previous is None): # if there have been no previous moves made
-	# 		return set(product(range(3), range(3)))
-
-	# 	subrow, subcol = self.previous[1] # subboard of previous move
-
-	# 	if (self.board[subrow][subcol] is not None): # if the corresponding subboard has been won
-	# 		return [(i, j) for i in range(3) for j in range(3) if self.board[i][j] is None] # all subboards that have not been won
-
-	# 	return {(subrow, subcol)} # the corresponding subboard of the previous move
-
-	# def possible_subboard(self, bigrow: int, bigcol: int) -> tuple[int, int]:
-	# 	"""finds the possible moves given a subboard to play in
-
-	# 	Args:
-	# 			bigrow (int): x coordinate of the subboard
-	# 			bigcol (int): y coordinate of the subboard
-
-	# 	Returns:
-	# 			list[tuple[int, int]]: list of possible moves
-	# 	"""
-
-	# 	subboard = self.subboards[bigrow][bigcol]
-
-	# 	return subboard.empty
 
 	def validate_move(self, move: Move) -> bool:
 		"""validates a move
@@ -140,18 +123,49 @@ class Board:
 
 		(bigrow, bigcol), (subrow, subcol) = move.relative
 
-		if not (self.board[bigrow, bigcol] is None): # if the subboard has already been won
+		if not (self.board[bigrow, bigcol] is None): # if the subboard that move is trying to play in has already been won
 			return False
 
 		if not ((subrow, subcol) in self.subboards[bigrow, bigcol].empty): # if the move has already been made
 			return False
 
 		if (self.previous is not None):
-			if not (move.bigrow == self.previous.subrow and move.bigcol == self.previous.subcol):
-				if (self.subboards[self.previous.bigrow, self.previous.bigcol].winner is not None):
-					return False
+			if not (move.bigrow == self.previous.subrow and move.bigcol == self.previous.subcol): # if it's not corresponding
+				if not (self.subboards[self.previous.subrow, self.previous.subcol].winner is None): # if the previous subboard has not been won
+					return True
+				return False
 
 		return True
+
+	def bwin(self) -> int:
+		"""who has won the board
+
+		Returns:
+				int: None if no winner yet; 0 if tie; -1 or 1 if player has won
+		"""
+
+		# check rows
+		for row in range(3):
+			if self.board[row, 0] == self.board[row, 1] == self.board[row, 2] and self.board[row, 0] is not None:
+				return self.board[row, 0]
+
+		# check columns
+		for col in range(3):
+			if self.board[0, col] == self.board[1, col] == self.board[2, col] and self.board[0, col] is not None:
+				return self.board[0, col]
+
+		# check diagonals
+		if self.board[0, 0] == self.board[1, 1] == self.board[2, 2] and self.board[0, 0] is not None:
+			return self.board[0, 0]
+		if self.board[0, 2] == self.board[1, 1] == self.board[2, 0] and self.board[0, 2] is not None:
+			return self.board[0, 2]
+
+		# check for tie
+		if np.unique(self.board) == set():
+			return 0
+
+		# no winner yet
+		return None
 
 	def move(self, move: Move) -> bool:
 		"""makes a move
@@ -180,26 +194,31 @@ class Board:
 		self.iplayer = -self.iplayer
 		self.previous = move
 
+		if ((winner := self.bwin()) is not None):
+			if (winner == 1):
+				print('X wins')
+			elif (winner == -1):
+				print('O wins')
+			elif (winner == 0):
+				print('Tie')
+
 		return True
 
 if __name__ == '__main__':
 	board = Board()
 
 	moves = [
-		Move(row=1, col=0),
-		Move(row=3, col=0),
-		Move(row=0, col=0),
+		Move(row=0, col=1),
+		Move(row=0, col=3),
+		Move(row=1, col=1),
+		Move(row=3, col=3),
 		Move(row=2, col=1),
-		Move(row=6, col=3),
-		Move(row=2, col=0),
-		Move(row=6, col=0),
-		Move(row=2, col=2),
-		Move(row=6, col=6),
 	]
 
-	# move = Move(row=0, col=0)
+	# # move = Move(row=0, col=0)
 	[board.move(move) for move in moves]
 
+	open('moves.log', 'a').write('\n\n')
 	while (True):
 		print(board, flush=True)
 
@@ -208,6 +227,9 @@ if __name__ == '__main__':
 
 		move = Move(row=row, col=col)
 		board.move(move)
+
+		with open('log', 'a') as f:
+			f.write(str(row) + ' ' + str(col) + '\n')
 
 	# move = Move(1, 2, 3, 4)
 	# print(type(move))
