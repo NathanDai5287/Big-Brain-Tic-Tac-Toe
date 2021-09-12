@@ -31,3 +31,19 @@ class Move:
 	@property
 	def absolute(self) -> tuple[int, int]:
 		return (self.row, self.col)
+
+	@property
+	def big(self) -> tuple[int, int]:
+		return (self.bigrow, self.bigcol)
+
+	@property
+	def sub(self) -> tuple[int, int]:
+		return (self.subrow, self.subcol)
+
+	def bcross(self) -> bool:
+		return self.bigrow == self.bigcol or self.bigrow + self.bigcol == 2
+
+	def group(self) -> set[object]:
+		for subrow in range(3):
+			for subcol in range(3):
+				yield Move(bigrow=self.bigrow, bigcol=self.bigcol, subrow=subrow, subcol=subcol)

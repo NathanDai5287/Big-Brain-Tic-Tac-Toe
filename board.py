@@ -161,13 +161,15 @@ class Board:
 			return self.board[0, 2]
 
 		# check for tie
-		if np.unique(self.board) == set():
-			return 0
+		for row in self.board:
+			for col in row:
+				if row is None:
+					return None
 
 		# no winner yet
 		return None
 
-	def move(self, move: Move) -> bool:
+	def move(self, row: int, col: int) -> bool:
 		"""makes a move
 
 		Args:
@@ -176,6 +178,8 @@ class Board:
 		Returns:
 				bool: True if the move was made, False otherwise
 		"""
+
+		move = Move(row=row, col=col)
 
 		if not (self.validate_move(move)):
 			print('Invalid Move')
