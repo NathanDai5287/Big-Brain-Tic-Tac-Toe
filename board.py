@@ -5,17 +5,6 @@ from move import Move
 # sys.stdout = open('stdout.out', 'w')
 
 class SubBoard:
-	x_win = np.array([
-			[1, 0, 1],
-			[0, 1, 0],
-			[1, 0, 1],
-		])
-
-	o_win = np.array([
-			[-1, -1, -1],
-			[-1, 0, -1],
-			[-1, -1, -1],
-		])
 
 	def __init__(self):
 		self.board = np.full((3, 3), None)
@@ -110,6 +99,22 @@ class Board:
 			out += '\n'
 
 		return out
+
+	def possible_moves(self) -> list[Move]:
+		"""finds the possible moves that can be made
+
+		Returns:
+				set[Move]: set of possible moves
+		"""
+
+		moves = []
+		for row in range(9):
+			for col in range(9):
+				move = Move(row=row, col=col)
+				if (self.validate_move(move)):
+					moves.append(move)
+
+		return moves
 
 	def validate_move(self, move: Move) -> bool:
 		"""validates a move
@@ -208,6 +213,21 @@ class Board:
 
 		return True
 
+	def ai_move(self): # TODO: implement algorithm
+		possible = self.possible_moves()
+		for move in possible:
+			hypothetical = deepcopy(self)
+			row, col = move.absolute
+			(bigrow, bigcol), (subrow, subcol) = move.relative
+			hypothetical.move(row, col)
+
+			if (hypothetical.board[bigrow, bigcol] == self.iplayer):
+				return move
+
+		move = random.choice(self.possible_moves())
+
+		return move
+
 if __name__ == '__main__':
 	board = Board()
 
@@ -237,3 +257,5 @@ if __name__ == '__main__':
 
 	# move = Move(1, 2, 3, 4)
 	# print(type(move))
+	#why is Kevin so good at this?
+	# Kevin is too good at this

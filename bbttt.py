@@ -4,11 +4,22 @@ from board import Board
 from move import Move
 
 from tkinter import *
+from tkinter import messagebox
 
 PINK = 'light pink'
 BLUE = 'light blue'
 DARK_PINK = '#D6586B'
 DARK_BLUE = '#3FA0BF'
+GREEN = 'light green'
+GRAY = 'light gray'
+DEFAULT = 'SystemButtonFace'
+
+DARK_BLUE = BLUE
+DARK_PINK = PINK
+
+# TODO: gray out subbaord on tie
+# TODO: end game
+# TODO: end game on tie
 
 class SubSquare(Button):
 	def __init__(self, master: object, row: int, col: int, **kwargs):
@@ -56,11 +67,14 @@ class BigBrainTicTacToe(Frame):
 		-1: {False: PINK, True: DARK_PINK},
 	}
 
-	def __init__(self, master: Tk):
+	def __init__(self, master: Tk, ai: bool=False, human_player=1):
 		super().__init__(master)
 		self.grid()
 
 		self.root = master
+
+		self.ai = ai
+		self.human_player = human_player
 
 		self.board = Board()
 		self.setup_subsquares()
@@ -71,7 +85,7 @@ class BigBrainTicTacToe(Frame):
 			for col in range(9):
 				move = Move(row=row, col=col)
 
-				button = SubSquare(self, row, col, width=4, height=2) # TODO: color the subboards with gray background
+				button = SubSquare(self, row, col, width=4, height=2)
 				button.config(command=lambda button=button: self.click(button))
 
 				if (move.bigrow == move.bigcol or move.bigrow + move.bigcol == 2):
@@ -80,14 +94,14 @@ class BigBrainTicTacToe(Frame):
 				self.buttons[row, col] = button
 				self.buttons[row, col].grid(row=row + 1, column=col, rowspan=1, columnspan=1)
 
-	def recolor_subboard(self, bigrow: int, bigcol: int, color: str):
+	def color_subboard(self, bigrow: int, bigcol: int, color: str): # BUG: something doesn't work here
 		for subrow in range(3):
 			for subcol in range(3):
 				move = Move(bigrow=bigrow, bigcol=bigcol, subrow=subrow, subcol=subcol)
 				row, col = move.absolute
 				self.buttons[row, col].config(bg=color)
 
-	def click(self, button: SubSquare):
+	def click(self, button: SubSquare, bhuman=True):
 		row, col = button.absolute
 		move = Move(row=row, col=col)
 		bigrow, bigcol = move.big
@@ -117,8 +131,40 @@ class BigBrainTicTacToe(Frame):
 				r, c = neighbor.absolute
 				self.buttons[r, c].config(bg=color)
 
+		# TODO: color possible subboards for the next move and uncolor previous
+		# if not (self.board.board[move.sub] is None):
+			# self.color_subboard(move.subrow, move.subcol, GREEN)
+
+		# previous = self.board.previous
+		# self.color_subboard(previous.bigrow, previous.bigcol, GRAY if previous.bcross() else DEFAULT)
+
+		# TODO: check win
+		if (bwin := self.board.bwin()): # display winner
+			bagain = messagebox.askyesno(f'{self.board.value_map[-self.board.iplayer]} Wins', 'Play again?')
+
+			if (bagain):
+				# self.newgame()
+				messagebox.showinfo('Error', 'Unfortunately this does not work yet')
+			else:
+				exit(0)
+
+		# move computer
+		if (self.ai and bhuman and not bwin):
+			self.after(1000, lambda: self.ai_move())
+			# self.ai_move()
+
+	def newgame(self):
+		[button.destroy() for button in self.buttons.flat]
+
+		self.__init__(self.root, ai=self.ai, human_player=self.human_player)
+
+	def ai_move(self):
+		move = self.board.ai_move()
+		self.click(self.buttons[move.row, move.col], bhuman=False)
+
 if __name__ == "__main__":
 	root = Tk()
 	root.title("Big Brain Tic-Tac-Toe")
-	game = BigBrainTicTacToe(root)
+	game = BigBrainTicTacToe(root, ai=True)
+	# game = BigBrainTicTacToe(root, ai=False)
 	game.mainloop()
