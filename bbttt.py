@@ -14,12 +14,13 @@ GREEN = 'light green'
 GRAY = 'light gray'
 DEFAULT = 'SystemButtonFace'
 
-DARK_BLUE = BLUE
-DARK_PINK = PINK
+# DARK_BLUE = BLUE
+# DARK_PINK = PINK
 
 # TODO: gray out subbaord on tie
 # TODO: end game
 # TODO: end game on tie
+# TODO: make the last move darker
 
 class SubSquare(Button):
 	def __init__(self, master: object, row: int, col: int, **kwargs):
@@ -85,7 +86,7 @@ class BigBrainTicTacToe(Frame):
 			for col in range(9):
 				move = Move(row=row, col=col)
 
-				button = SubSquare(self, row, col, width=4, height=2)
+				button = SubSquare(self, row, col, width=4, height=2, pady=20, padx=20)
 				button.config(command=lambda button=button: self.click(button))
 
 				if (move.bigrow == move.bigcol or move.bigrow + move.bigcol == 2):
@@ -107,6 +108,7 @@ class BigBrainTicTacToe(Frame):
 		bigrow, bigcol = move.big
 
 		iplayer = self.board.iplayer
+		previous = self.board.previous
 		bvalid = self.board.move(row, col)
 		bcross = move.bcross()
 
@@ -117,19 +119,24 @@ class BigBrainTicTacToe(Frame):
 		self.buttons[row, col].config(
 			text=self.board.value_map[iplayer],
 			relief=SUNKEN,
-			bg=self.color_map[iplayer][bcross],
+			bg=self.color_map[iplayer][False],
 		)
 
 		# if the subboard was won, color it
 		if not ((status := self.board.board[bigrow, bigcol]) is None):
 			if (status == 1):
-				color = DARK_BLUE if bcross else BLUE
+				color = BLUE
 			elif (status == -1):
-				color = DARK_PINK if bcross else PINK
+				color = PINK
 
 			for neighbor in move.group():
 				r, c = neighbor.absolute
 				self.buttons[r, c].config(bg=color)
+
+		# darken the current move and undarken the previous move
+		self.buttons[move.absolute].config(bg=self.color_map[iplayer][True])
+		if (previous is not None):
+			self.buttons[previous.absolute].config(bg=self.color_map[-iplayer][False])
 
 		# TODO: color possible subboards for the next move and uncolor previous
 		# if not (self.board.board[move.sub] is None):
@@ -156,15 +163,22 @@ class BigBrainTicTacToe(Frame):
 	def newgame(self):
 		[button.destroy() for button in self.buttons.flat]
 
-		self.__init__(self.root, ai=self.ai, human_player=self.human_player)
+		# self.__init__(self.root, ai=self.ai, human_player=self.human_player)
+		self.__init__(Tk(), ai=self.ai, human_player=self.human_player)
 
 	def ai_move(self):
 		move = self.board.ai_move()
 		self.click(self.buttons[move.row, move.col], bhuman=False)
 
 if __name__ == "__main__":
+	parser = argparse.ArgumentParser()
+	parser.add_argument('--ai', action='store_true', help='play against the computer')
+	args = parser.parse_args()
+
 	root = Tk()
 	root.title("Big Brain Tic-Tac-Toe")
-	game = BigBrainTicTacToe(root, ai=True)
-	# game = BigBrainTicTacToe(root, ai=False)
+	# game = BigBrainTicTacToe(root, ai=True)
+	game = BigBrainTicTacToe(root, ai=False)
+	# print(args.ai)
+	# game = BigBrainTicTacToe(root, ai=args.ai)
 	game.mainloop()

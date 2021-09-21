@@ -50,6 +50,10 @@ class SubBoard:
 		# no winner yet
 		return None
 
+	@property
+	def as_tuple(self):
+		return tuple(map(tuple, self.board))
+
 	def validate_move(self, row: int, col: int) -> bool:
 		if ((row, col) in self.empty):
 			return True
@@ -100,7 +104,18 @@ class Board:
 
 		return out
 
-	def possible_moves(self) -> list[Move]:
+	@property
+	def absolute(self) -> np.array:
+		absolute = np.empty((9, 9), dtype=int)
+		for row in range(9):
+			for col in range(9):
+				move = Move(row=row, col=col)
+				(bigrow, bigcol), (subrow, subcol) = move.relative
+				absolute[row, col] = self.subboards[bigrow, bigcol][subrow, subcol]
+
+		return absolute
+
+	def possible_moves(self) -> list[Move]: # BUG: make sure the subboard is corresponding
 		"""finds the possible moves that can be made
 
 		Returns:
@@ -214,11 +229,16 @@ class Board:
 		return True
 
 	def ai_move(self): # TODO: implement algorithm
-		possible = self.possible_moves()
+		possible = self.possible_moves() # BUG: too many possible moves 54 should be 9
 		for move in possible:
 			hypothetical = deepcopy(self)
 			row, col = move.absolute
-			(bigrow, bigcol), (subrow, subcol) = move.relative
+			bigrow, bigcol = move.big
+			subrow, subcol = move.sub
+
+			if (self.board[subrow, subcol] is not None):
+				continue
+
 			hypothetical.move(row, col)
 
 			if (hypothetical.board[bigrow, bigcol] == self.iplayer):
@@ -257,5 +277,3 @@ if __name__ == '__main__':
 
 	# move = Move(1, 2, 3, 4)
 	# print(type(move))
-	#why is Kevin so good at this?
-	# Kevin is too good at this

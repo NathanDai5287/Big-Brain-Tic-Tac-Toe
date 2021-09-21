@@ -1,5 +1,5 @@
 class Move:
-	def __init__(self, row: int=None, col: int=None, bigrow: int=None, bigcol: int=None, subrow: int=None, subcol: int=None):
+	def __init__(self, row: int=None, col: int=None, bigrow: int=None, bigcol: int=None, subrow: int=None, subcol: int=None, iplayer: int=None):
 		if (None in {row, col}):
 			assert None not in {bigrow, bigcol, subrow, subcol}
 			absolute = False
@@ -20,6 +20,8 @@ class Move:
 		self.bigcol = bigcol
 		self.subrow = subrow
 		self.subcol = subcol
+
+		self.iplayer = iplayer
 
 	def __repr__(self):
 		return str(self.absolute) + '\n' + str(self.relative)
