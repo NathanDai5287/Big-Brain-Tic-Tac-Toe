@@ -77,6 +77,8 @@ class BigBrainTicTacToe(Frame):
 		self.ai = ai
 		self.human_player = human_player
 
+		self.root.bind('<Control-z>', self.undo)
+
 		self.board = Board()
 		self.setup_subsquares()
 
@@ -103,6 +105,9 @@ class BigBrainTicTacToe(Frame):
 				self.buttons[row, col].config(bg=color)
 
 	def click(self, button: SubSquare, bhuman=True):
+		with open('previous.pkl', 'wb') as f:
+			pickle.dump(self.board, f)
+
 		row, col = button.absolute
 		move = Move(row=row, col=col)
 		bigrow, bigcol = move.big
@@ -159,6 +164,18 @@ class BigBrainTicTacToe(Frame):
 		if (self.ai and bhuman and not bwin):
 			self.after(1000, lambda: self.ai_move())
 			# self.ai_move()
+
+	def undo(self, *args):
+		with open('previous.pkl', 'rb') as f:
+			self.board = pickle.load(f)
+
+	def dump(self):
+		with open('previous.pkl', 'wb') as f:
+			pickle.dump(self.board, f)
+
+	def load(self, filename: str='previous.pkl'):
+		with open(filename, 'rb') as f:
+			self.board = pickle.load(f)
 
 	def newgame(self):
 		[button.destroy() for button in self.buttons.flat]
