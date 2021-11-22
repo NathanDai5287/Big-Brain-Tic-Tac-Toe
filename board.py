@@ -1,8 +1,7 @@
 from dependencies import *
 
 from move import Move
-
-# sys.stdout = open('stdout.out', 'w')
+from ttt import TicTacToe
 
 class SubBoard:
 
@@ -66,6 +65,15 @@ class Board:
 							 None: '~',
 							 1: 'X'}
 
+	lines = {
+			((0, 0), (0, 1), (0, 2)), ((0, 2), (1, 1), (2, 0)), ((2, 0), (2, 1), (2, 2)), # rows
+			((0, 1), (1, 1), (2, 1)), ((0, 0), (1, 1), (2, 2)), ((1, 0), (1, 1), (1, 2)), # columns
+			((0, 0), (1, 0), (2, 0)), ((0, 2), (1, 2), (2, 2)) # diagonals
+		}
+
+	with open('ttt.pkl', 'rb') as f:
+		fitness = pickle.load(f)
+
 	def __init__(self):
 		# big board
 		# None if nobody has won the subboard
@@ -75,6 +83,15 @@ class Board:
 
 		self.iplayer = 1 # tracks which player should go
 		self.previous: Move = None # previous move. None represents no previous moves
+
+		# TEMP: subject to change
+		self.importance = np.array([ # importance score of each subboard CHANGE
+			[1, 0, 1],
+			[0, 2, 0],
+			[1, 0, 1],
+		], dtype=float)
+
+		self.initial = self.importance.copy()
 
 	def __repr__(self):
 		out = ''
@@ -114,6 +131,20 @@ class Board:
 				absolute[row, col] = self.subboards[bigrow, bigcol][subrow, subcol]
 
 		return absolute
+
+	def next_subboard(self) -> tuple[int, int]:
+		"""returns the next subboard to play in; -1 if any
+
+		Returns:
+				tuple[int, int]: the next subboard to play in
+		"""
+
+		bigrow, bigcol = self.previous.sub
+
+		if (self.subboards[bigrow, bigcol].winner is None):
+			return bigrow, bigcol
+
+		return (-1, -1)
 
 	def possible_moves(self) -> list[Move]: # BUG: make sure the subboard is corresponding
 		"""finds the possible moves that can be made
@@ -157,7 +188,7 @@ class Board:
 
 		return True
 
-	def bwin(self) -> int:
+	def bwin(self) -> int: # REFACTOR: refactor using self.lines
 		"""who has won the board
 
 		Returns:
@@ -202,6 +233,7 @@ class Board:
 		move = Move(row=row, col=col)
 
 		if not (self.validate_move(move)):
+			print(move)
 			print('Invalid Move')
 			print(f'{self.value_map[self.iplayer]} to move')
 
@@ -228,23 +260,163 @@ class Board:
 
 		return True
 
-	def ai_move(self): # TODO: implement algorithm
-		possible = self.possible_moves() # BUG: too many possible moves 54 should be 9
-		for move in possible:
-			hypothetical = deepcopy(self)
-			row, col = move.absolute
-			bigrow, bigcol = move.big
-			subrow, subcol = move.sub
+	# returns the average importance score of all the subboards that have not been won
+	def total_importance(self) -> float:
+		total = 0
+		counter = 0
+		for row in range(3):
+			for col in range(3):
+				if (self.board[row, col] is None):
+					total += self.importance[row, col]
+					counter += 1
 
-			if (self.board[subrow, subcol] is not None):
-				continue
+		return total / counter
 
-			hypothetical.move(row, col)
+	def scale_importance(self, lower: float=0, upper: float=10):
+		smallest = np.amin(self.importance)
+		largest = np.amax(self.importance)
 
-			if (hypothetical.board[bigrow, bigcol] == self.iplayer):
-				return move
+		def f(x):
+			m = (upper - lower) / (largest - smallest)
 
-		move = random.choice(self.possible_moves())
+			return m * (x - smallest) + lower
+
+		transformation = np.vectorize(f)
+
+		self.importance = transformation(self.importance)
+
+	def ai_move(self, bdumb=False) -> Move:
+		def dumb():
+			possible = self.possible_moves()
+			for move in possible:
+				hypothetical = deepcopy(self)
+				row, col = move.absolute
+				bigrow, bigcol = move.big
+				subrow, subcol = move.sub
+
+				if (self.board[subrow, subcol] is not None):
+					continue
+
+				hypothetical.move(row, col)
+
+				if (hypothetical.board[bigrow, bigcol] == self.iplayer):
+					return move
+
+			move = random.choice(self.possible_moves())
+
+			return move
+
+		if (bdumb):
+			dumb()
+
+		for bigrow in range(3):
+			for bigcol in range(3):
+				subboard = self.subboards[bigrow, bigcol]
+
+				# self vs. opponent move count
+
+				count = 0
+				for subrow in range(3):
+					for subcol in range(3):
+						# if (self.board[subrow, subcol] is not None):
+							# print('Won')
+							# count += 5 * self.total_importance()
+							# count += 5000000
+						if (subboard[subrow, subcol] == -self.iplayer):
+							count += 1
+						elif (subboard[subrow, subcol] == self.iplayer):
+							count -= 1
+
+				self.importance[bigrow, bigcol] += count
+
+		# same as line 358
+		# increase importance if the subboard is won
+		# for row in range(3):
+			# for col in range(3):
+				# if (self.board[row, col] is not None):
+					# self.importance[row, col] += 50000
+
+		# the subboards that can lead to a win have higher scores
+
+		# raise the score of all subboards in the line by their average importance
+		shift = np.full((3, 3), 0, dtype=float)
+		for a, b, c in self.lines: # TODO:
+			average = (abs(self.importance[a]) + abs(self.importance[b]) + abs(self.importance[c])) / 3
+
+			# if (a != None or b != None or c != None): # CONFUCIOUS: idk why this is here
+				# average *= -1
+
+			shift[a] += average
+			shift[b] += average
+			shift[c] += average
+
+		self.importance += shift
+
+		self.scale_importance()
+
+		# add importance to subboards that have been won
+		for row in range(3):
+			for col in range(3):
+				if (self.board[row, col] is not None):
+					self.importance[row, col] = 10
+
+		# possible = [(row, col) for row in range(3) for col in range(3) if subboard[row, col] is None]
+
+		scores = sorted(self.importance.flatten(), reverse=True)
+
+		bigrow, bigcol = self.next_subboard()
+		subboard = self.subboards[bigrow, bigcol]
+
+		if ((bigrow, bigcol) == (-1, -1)): # TODO: handle case where the player is sent to a taken subboard
+			bigrow, bigcol = random.choice(np.where(self.importance == np.amax(self.importance)))
+
+		if (self.importance[bigrow, bigcol] >= scores[2]): # BUG: sending me to taken square
+			print('Important')
+
+			ttt = TicTacToe(self.subboards[bigrow, bigcol], self.iplayer)
+
+			for row in range(3):
+				for col in range(3):
+					if (self.board[row, col] is not None):
+						hypothetical = deepcopy(ttt)
+						hypothetical.move(row, col)
+
+						score = self.fitness[hypothetical] # BUG: not all states are in self.fitness ex: two O in one subboard
+
+						self.importance[row, col] -= 2 * score
+
+			scores = sorted(self.importance.flatten())
+			for score in scores: # BUG: if all of the important subboards are taken, this will cause an error
+				# TODO: use numpy.amax to find the highest score
+
+				useless_coords = list(map(tuple, np.asarray(np.where(np.isclose(self.importance, score))).T))
+				useless_coords = [coord for coord in useless_coords if subboard[coord] is None]
+
+				if (useless_coords):
+					selection = random.choice(np.transpose(np.where(self.importance == np.amax(self.importance))))
+					break
+
+		if (self.importance[bigrow, bigcol] < scores[2]): # if the player was not sent to an important subboard
+			# useless = np.asarray(np.where(self.importance == scores[-1])).T
+			# selection = random.choice(useless)
+			for score in scores[::-1]:
+				useless_coords = list(map(tuple, np.asarray(np.where(np.isclose(self.importance, score))).T))
+				useless_coords = [coord for coord in useless_coords if subboard[coord] is None]
+
+				if (useless_coords):
+					selection = random.choice(useless_coords)
+					break
+
+			print('not important')
+
+		# elif (self.importance[bigrow, bigcol] > scores[2]): # if the player was sent to an important subboard
+			# TODO: pick the best move that will do the least damange
+
+			# scores = sorted(self.importance.flatten(), reverse=True)
+
+		move = Move(bigrow=bigrow, bigcol=bigcol, subrow=selection[0], subcol=selection[1])
+
+		print(self.importance)
 
 		return move
 
