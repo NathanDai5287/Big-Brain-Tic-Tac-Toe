@@ -1,0 +1,20 @@
+#bbttt {
+	padding: 20px;
+}
+
+.col-sm {
+	margin: 10px;
+	flex-grow: 0;
+	flex-wrap: nowrap;
+	padding: 0;
+}
+
+.row {
+	flex-wrap: nowrap;
+	width: fit-content;
+}
+
+.border-right {
+	padding-right: 10px;
+	margin-right: 2px;
+}

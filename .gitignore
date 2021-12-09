@@ -4,3 +4,5 @@ build/
 tempCodeRunnerFile.*
 old/
 delete.*
+*.pyc
+.vscode/

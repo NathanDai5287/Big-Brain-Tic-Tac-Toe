@@ -50,12 +50,16 @@ class Move {
 		return this.bigrow == this.bigcol || this.bigrow + this.bigcol == 2;;
 	}
 
-	*group() {
+	*group(bigrow, bigcol) {
+		var moves = [];
 		for (let subrow = 0; subrow < 3; subrow++) {
 			for (let subcol = 0; subcol < 3; subcol++) {
-				yield Move(bigrow = this.bigrow, bigcol = this.bigcol, subrow = subrow, subcol = subcol);
+				yield new Move(bigrow = bigrow, bigcol = bigcol, subrow = subrow, subcol = subcol);
+				// moves.push(Move(bigrow = this.bigrow, bigcol = this.bigcol, subrow = subrow, subcol = subcol));
 			}
 		}
+
+		return moves;
 	}
 }
 
