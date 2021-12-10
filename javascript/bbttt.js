@@ -1,6 +1,6 @@
 
 const PINK = '#ffb6c1';
-const BLUE = 'add8e6';
+const BLUE = '#add8e6';
 const DARK_PINK = '#d6586b';
 const DARK_BLUE = '#3FA0BF';
 const GRAY = '#d3d3d3';
@@ -47,7 +47,7 @@ class BigBrainTicTacToe {
 
 		var state = this.board.board[bigrow][bigcol];
 		var color;
-		if (state == null) {
+		if (state != null) {
 			if (state == 1) {
 				color = BLUE;
 			} else if (state == -1) {

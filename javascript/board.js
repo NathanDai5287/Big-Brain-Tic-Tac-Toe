@@ -91,18 +91,18 @@ class SubBoard {
 
 	winner() {
 		for (let i = 0; i < 3; i++) {
-			if (this.board[i][0] == this.board[i][1] == this.board[i][2] && this.board[i][0] != null) {
+			if (this.board[i][0] == this.board[i][1] && this.board[i][1] == this.board[i][2] && this.board[i][0] != null) {
 				return this.board[i][0];
 			}
 		}
 
 		for (let j = 0; j < 3; j++) {
-			if (this.board[0][j] == this.board[1][j] == this.board[2][j] && this.board[0][j] != null) {
+			if (this.board[0][j] == this.board[1][j] && this.board[1][j] == this.board[2][j] && this.board[0][j] != null) {
 				return this.board[0][j];
 			}
 		}
 
-		if (this.board[0][0] == this.board[1][1] == this.board[2][2] && this.board[0][0] != null) {
+		if (this.board[0][0] == this.board[1][1] && this.board[1][1] == this.board[2][2] && this.board[0][0] != null) {
 			return this.board[0][2];
 		}
 
@@ -335,3 +335,18 @@ class Board {
 // console.log(board.__repr__());
 // board.move(1, 2);
 // console.log(board.__repr__());
+
+// var subboard = new SubBoard();
+
+// subboard.board = [
+// 	[-1, -1, -1],
+// 	[-1, -1, -1],
+// 	[-1, -1, -1],
+// ]
+
+// subboard.winner();
+
+var move = new Move(row = 0, col = 0);
+for (let i of move.group(0, 0)) {
+
+}
