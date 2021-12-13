@@ -1,5 +1,6 @@
 class Move {
-	constructor(row = undefined, col = undefined, bigrow = undefined, bigcol = undefined, subrow = undefined, subcol = undefined, iplayer = undefined) {
+	// constructor(row = undefined, col = undefined, bigrow = undefined, bigcol = undefined, subrow = undefined, subcol = undefined, iplayer = undefined) {
+	constructor(row, col, bigrow, bigcol, subrow, subcol, iplayer) {
 
 		var absolute;
 		if (row == undefined || col == undefined) {
@@ -47,14 +48,14 @@ class Move {
 	}
 
 	bcross() {
-		return this.bigrow == this.bigcol || this.bigrow + this.bigcol == 2;;
+		return this.bigrow == this.bigcol || this.bigrow + this.bigcol == 2;
 	}
 
 	*group(bigrow, bigcol) {
 		var moves = [];
 		for (let subrow = 0; subrow < 3; subrow++) {
 			for (let subcol = 0; subcol < 3; subcol++) {
-				yield new Move(bigrow = bigrow, bigcol = bigcol, subrow = subrow, subcol = subcol);
+				yield new Move(null, null, bigrow, bigcol, subrow, subcol, null);
 				// moves.push(Move(bigrow = this.bigrow, bigcol = this.bigcol, subrow = subrow, subcol = subcol));
 			}
 		}
@@ -320,33 +321,4 @@ class Board {
 
 		return true;
 	}
-}
-
-// var board = new Board();
-
-// var move = new Move(row = 0, col = 0);
-// board.move(1, 0);
-// console.log(board.__repr__());
-// board.move(3, 0);
-// console.log(board.__repr__());
-// board.move(1, 1);
-// console.log(board.__repr__());
-// board.move(3, 3);
-// console.log(board.__repr__());
-// board.move(1, 2);
-// console.log(board.__repr__());
-
-// var subboard = new SubBoard();
-
-// subboard.board = [
-// 	[-1, -1, -1],
-// 	[-1, -1, -1],
-// 	[-1, -1, -1],
-// ]
-
-// subboard.winner();
-
-var move = new Move(row = 0, col = 0);
-for (let i of move.group(0, 0)) {
-
 }
