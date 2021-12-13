@@ -1,22 +1,84 @@
+:root {
+	--dark-blue: rgb(63, 160, 191);
+	--light-blue: rgb(173, 216, 230);
+	--dark-red: rgb(214, 88, 107);
+	--light-red: rgb(255, 182, 193);
+}
+
+body {
+	overflow: hidden;
+}
+
 #bbttt {
 	padding: 20px;
 	width: fit-content;
 	margin: 0 auto;
+	padding-top: 5vh;
 }
 
 .col-sm {
-	margin: 10px;
+	margin: 0;
 	flex-grow: 0;
 	flex-wrap: nowrap;
 	padding: 0;
 }
 
-.row {
+#bbttt.row {
 	flex-wrap: nowrap;
 	width: fit-content;
 }
 
-.border-right {
-	padding-right: 10px;
-	margin-right: 2px;
+.square {
+	width: min(9vh, 9vw);
+	height: min(9vh, 9vw);
+	border: 1px solid black;
+	border-radius: 5px;
+
+	font: 1em Nunito;
+}
+
+.dark-blue {
+	background-color: var(--dark-blue);
+}
+
+.light-blue {
+	background-color: var(--light-blue);
+}
+
+.dark-red {
+	background-color: var(--dark-red);
+}
+
+.light-red {
+	background-color: var(--light-red);
+}
+
+.top {
+	border-top: 5px solid black;
+}
+
+.bottom {
+	border-bottom: 5px solid black;
+}
+
+.left {
+	border-left: 5px solid black;
+}
+
+.right {
+	border-right: 5px solid black;
+}
+
+.timer {
+	font-size: 1.5em;
+	font-weight: bold;
+	width: fit-content;
+}
+
+.blue {
+	color: rgb(0, 0, 255);
+}
+
+.red {
+	color: rgb(255, 0, 0);
 }

@@ -103,7 +103,7 @@ class SubBoard {
 		}
 
 		if (this.board[0][0] == this.board[1][1] && this.board[1][1] == this.board[2][2] && this.board[0][0] != null) {
-			return this.board[0][2];
+			return this.board[0][0];
 		}
 		if (this.board[0][2] == this.board[1][1] && this.board[1][1] == this.board[2][0] && this.board[0][2] != null) {
 			return this.board[0][2];
