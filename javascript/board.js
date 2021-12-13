@@ -1,5 +1,4 @@
 class Move {
-	// constructor(row = undefined, col = undefined, bigrow = undefined, bigcol = undefined, subrow = undefined, subcol = undefined, iplayer = undefined) {
 	constructor(row, col, bigrow, bigcol, subrow, subcol, iplayer) {
 
 		var absolute;
@@ -104,6 +103,9 @@ class SubBoard {
 		}
 
 		if (this.board[0][0] == this.board[1][1] && this.board[1][1] == this.board[2][2] && this.board[0][0] != null) {
+			return this.board[0][2];
+		}
+		if (this.board[0][2] == this.board[1][1] && this.board[1][1] == this.board[2][0] && this.board[0][2] != null) {
 			return this.board[0][2];
 		}
 

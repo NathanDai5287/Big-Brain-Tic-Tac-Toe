@@ -1,4 +1,3 @@
-
 const PINK = '#ffb6c1';
 const BLUE = '#add8e6';
 const DARK_PINK = '#d6586b';
