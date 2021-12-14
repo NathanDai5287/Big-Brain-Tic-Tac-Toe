@@ -2,7 +2,6 @@ document.getElementById('play').addEventListener('click', function() {
 	var time = document.getElementById('time').value;
 	var url = new URL(window.location.href);
 
-	// url.pathname = '/play.html';
 	url.pathname = url.pathname.replace(/\/[^\/]*$/, '/play.html');
 	url.searchParams.set('time', time);
 

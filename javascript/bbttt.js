@@ -63,6 +63,7 @@ class BigBrainTicTacToe {
 			return;
 		}
 
+		// color the possible subboards for the next move
 		for (let nextrow = 0; nextrow < 3; nextrow++) {
 			for (let nextcol = 0; nextcol < 3; nextcol++) {
 				this.uncolor_subboard(nextrow, nextcol);
@@ -70,15 +71,15 @@ class BigBrainTicTacToe {
 		}
 
 		var [nextbigrow, nextbigcol] = this.board.next_subboard();
-		if (nextbigrow == -1 && nextbigcol == -1) {
+		if (nextbigrow == -1 && nextbigcol == -1) { // if any subboard is possible
 			for (let nextrow = 0; nextrow < 3; nextrow++) {
 				for (let nextcol = 0; nextcol < 3; nextcol++) {
-					if (this.board.board[nextrow][nextcol] != null) {
+					if (this.board.board[nextrow][nextcol] == null) { // if the subboard has not been won
 						this.color_subboard(nextrow, nextcol);
 					}
 				}
 			}
-		} else {
+		} else { // only one possible
 			this.color_subboard(nextbigrow, nextbigcol);
 		}
 
