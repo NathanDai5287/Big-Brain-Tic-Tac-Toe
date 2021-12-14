@@ -3,12 +3,17 @@
 	--light-blue: rgb(173, 216, 230);
 	--dark-red: rgb(214, 88, 107);
 	--light-red: rgb(255, 182, 193);
+	--background: #f6f1d1;
+	--cell-background: #f6f3e1;
+	--selected: #dcd9c8;
 }
 
 body {
 	overflow: hidden;
 	padding-left: 50px;
 	padding-right: 50px;
+	background-color: var(--background);
+	font-family: Nunito Calibri;
 }
 
 #bbttt {
@@ -35,8 +40,9 @@ body {
 	height: min(9vh, 9vw);
 	border: 1px solid black;
 	border-radius: 5px;
+	background-color: var(--cell-background);
 
-	font: 1em Nunito;
+	font: 3em;
 }
 
 .dark-blue {
@@ -89,4 +95,8 @@ body {
 .timer-container {
 	font-size: 2em;
 	padding: 10px;
+}
+
+.selected {
+	background-color: var(--selected);
 }

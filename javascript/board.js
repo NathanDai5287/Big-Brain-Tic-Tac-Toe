@@ -61,6 +61,11 @@ class Move {
 
 		return moves;
 	}
+
+	id() {
+		let [row, col] = this.absolute();
+		return row + ' ' + col;
+	}
 }
 
 class SubBoard {
@@ -122,6 +127,16 @@ class SubBoard {
 		}
 
 		return false;
+	}
+
+	next_subboard() {
+		var [bigrow, bigcol] = this.previous.sub();
+
+		if (this.subboards[bigrow][bigcol].winner() == null) {
+			return [bigrow, bigcol];
+		}
+
+		return [-1, -1];
 	}
 
 	move(row, col, iplayer) {
@@ -193,14 +208,14 @@ class Board {
 	next_subboard() {
 		var [bigrow, bigcol] = this.previous.sub();
 
-		if (this.subboards[bigrow, bigcol].winner() == null) {
+		if (this.subboards[bigrow][bigcol].winner() == null) {
 			return [bigrow, bigcol];
 		}
 
 		return [-1, -1];
 	}
 
-	possible_moves() {
+	*possible_moves() {
 		var moves = [];
 
 		var move;
@@ -209,7 +224,8 @@ class Board {
 				move = new Move(row = row, col = col);
 
 				if (this.validate_move(move)) {
-					moves.push(move);
+					// moves.push(move);
+					yield move;
 				}
 			}
 		}
@@ -323,4 +339,9 @@ class Board {
 
 		return true;
 	}
+
+	// undo() {
+	// 	this.previous *= -1;
+
+	// }
 }
