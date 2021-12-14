@@ -5,7 +5,7 @@ const DARK_BLUE = '#3FA0BF';
 const GRAY = '#d3d3d3';
 
 class BigBrainTicTacToe {
-	constructor(minutes=3) {
+	constructor() {
 		this.color_map = {
 			1: { false: BLUE, true: DARK_BLUE },
 			'-1': { false: PINK, true: DARK_PINK },
@@ -14,7 +14,22 @@ class BigBrainTicTacToe {
 		this.board = new Board();
 		this.handler();
 
-		this.timer = new Timer(minutes);
+		this.timer = new Timer(this.getTime());
+		var [min, sec] = this.timer.time(1);
+		this.setTime(min, sec);
+	}
+
+	getTime() {
+		var url = new URL(window.location.href);
+		var time = url.searchParams.get('time');
+
+		return time;
+	}
+
+	setTime(min, sec) {
+		for (let label of document.getElementsByClassName('time')) {
+			label.innerText = min + ':' + String(sec).padStart(2, '0');
+		}
 	}
 
 	handler() {
@@ -32,7 +47,7 @@ class BigBrainTicTacToe {
 		this.timer.swap();
 		if (this.board.previous == null) {
 			this.timer.start();
-			this.update = setInterval(() => {this.updateTimer()}, 1000);
+			this.update = setInterval(() => { this.updateTimer() }, 500);
 		}
 
 		var move = new Move(row = row, col = col);
@@ -129,7 +144,7 @@ class Timer {
 	}
 
 	start() {
-		let timer = setInterval(() => {
+		this.timer = setInterval(() => {
 			if (this.playing == 1) {
 				this.xsec--;
 				if (this.xsec == 0) {
@@ -147,7 +162,7 @@ class Timer {
 	}
 
 	stoptimer() {
-		clearInterval(timer);
+		clearInterval(this.timer);
 	}
 }
 
