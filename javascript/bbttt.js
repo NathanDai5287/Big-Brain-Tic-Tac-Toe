@@ -5,7 +5,7 @@ const DARK_BLUE = '#3FA0BF';
 const GRAY = '#d3d3d3';
 
 class BigBrainTicTacToe {
-	constructor() {
+	constructor(aiPlayer) {
 		this.color_map = {
 			1: { false: BLUE, true: DARK_BLUE },
 			'-1': { false: PINK, true: DARK_PINK },
@@ -13,6 +13,8 @@ class BigBrainTicTacToe {
 
 		this.board = new Board();
 		this.handler();
+
+		this.aiPlayer = aiPlayer;
 
 		this.timer = new Timer(this.getTime());
 		var [min, sec] = this.timer.time(1);
@@ -50,7 +52,7 @@ class BigBrainTicTacToe {
 			this.update = setInterval(() => { this.updateTimer() }, 500);
 		}
 
-		var move = new Move(row = row, col = col);
+		var move = new Move(row, col);
 		var [bigrow, bigcol] = move.big();
 
 		var iplayer = this.board.iplayer;
@@ -59,6 +61,25 @@ class BigBrainTicTacToe {
 
 		if (!bvalid) {
 			return;
+		}
+
+		for (let nextrow = 0; nextrow < 3; nextrow++) {
+			for (let nextcol = 0; nextcol < 3; nextcol++) {
+				this.uncolor_subboard(nextrow, nextcol);
+			}
+		}
+
+		var [nextbigrow, nextbigcol] = this.board.next_subboard();
+		if (nextbigrow == -1 && nextbigcol == -1) {
+			for (let nextrow = 0; nextrow < 3; nextrow++) {
+				for (let nextcol = 0; nextcol < 3; nextcol++) {
+					if (this.board.board[nextrow][nextcol] != null) {
+						this.color_subboard(nextrow, nextcol);
+					}
+				}
+			}
+		} else {
+			this.color_subboard(nextbigrow, nextbigcol);
 		}
 
 		var id = row + ' ' + col;
@@ -108,6 +129,77 @@ class BigBrainTicTacToe {
 		var time = minutes + ':' + String(seconds).padStart(2, '0');
 
 		document.getElementById(this.timer.getid()).innerText = time;
+	}
+
+	color_possible() {
+		for (let bigrow = 0; bigrow < 3; bigrow++) {
+			for (let bigcol = 0; bigcol < 3; bigcol++) {
+				uncolor_subboard(bigrow, bigcol);
+			}
+		}
+
+		var [bigrow, bigcol] = this.board.next_subboard();
+		this.color_subboard(bigrow, bigcol);
+	}
+
+	color_subboard(bigrow, bigcol) {
+		var move, id;
+		for (let subrow = 0; subrow < 3; subrow++) {
+			for (let subcol = 0; subcol < 3; subcol++) {
+				move = new Move(null, null, bigrow, bigcol, subrow, subcol);
+				id = move.id();
+				var button = document.getElementById(id);
+				button.classList.add('selected');
+			}
+		}
+	}
+
+	uncolor_subboard(bigrow, bigcol) {
+		var move, id;
+		for (let subrow = 0; subrow < 3; subrow++) {
+			for (let subcol = 0; subcol < 3; subcol++) {
+				move = new Move(null, null, bigrow, bigcol, subrow, subcol);
+				id = move.id();
+				var button = document.getElementById(id);
+				button.classList.remove('selected');
+			}
+		}
+	}
+
+	undo() {
+		this.board.undo();
+	}
+
+	minimax(depth, player, alpha, beta) {
+		var moves = Array.from(this.board.possible_moves());
+
+		var score, best_move;
+
+		if (depth == 0 || moves.length == 0) {
+
+		}
+
+		var move;
+		var row, col;
+		for (let move of moves) {
+			[row, col] = move.absolute();
+			this.move(row, col);
+
+			var score = this.minimax(depth - 1, -player, alpha, beta).score;
+
+			if (player == this.aiPlayer) {
+				if (score > alpha) {
+					alpha = score;
+					best_move = move;
+				}
+			} else {
+				if (score < beta) {
+					beta = score;
+					best_move = move;
+				}
+			}
+			this.undo();
+		}
 	}
 }
 
