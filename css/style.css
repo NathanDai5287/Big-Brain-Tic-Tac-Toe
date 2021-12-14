@@ -7,13 +7,15 @@
 
 body {
 	overflow: hidden;
+	padding-left: 50px;
+	padding-right: 50px;
 }
 
 #bbttt {
 	padding: 20px;
 	width: fit-content;
 	margin: 0 auto;
-	padding-top: 5vh;
+	padding-top: 0;
 }
 
 .col-sm {
@@ -72,7 +74,7 @@ body {
 .timer h1 {
 	font-size: 1.5em;
 	font-weight: bold;
-	width: fit-content;
+	/* width: fit-content; */
 	padding: 1px;
 }
 
@@ -82,4 +84,9 @@ body {
 
 .red {
 	color: rgb(255, 0, 0);
+}
+
+.timer-container {
+	font-size: 2em;
+	padding: 10px;
 }

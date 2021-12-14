@@ -89,7 +89,6 @@ class BigBrainTicTacToe {
 	}
 
 	updateTimer() {
-		console.log('update');
 		var [minutes, seconds] = this.timer.time(this.board.iplayer);
 		var time = minutes + ':' + String(seconds).padStart(2, '0');
 
