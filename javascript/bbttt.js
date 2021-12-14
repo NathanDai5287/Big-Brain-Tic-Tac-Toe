@@ -5,7 +5,7 @@ const DARK_BLUE = '#3FA0BF';
 const GRAY = '#d3d3d3';
 
 class BigBrainTicTacToe {
-	constructor() {
+	constructor(minutes=3) {
 		this.color_map = {
 			1: { false: BLUE, true: DARK_BLUE },
 			'-1': { false: PINK, true: DARK_PINK },
@@ -13,6 +13,8 @@ class BigBrainTicTacToe {
 
 		this.board = new Board();
 		this.handler();
+
+		this.timer = new Timer(minutes);
 	}
 
 	handler() {
@@ -27,6 +29,12 @@ class BigBrainTicTacToe {
 	}
 
 	move(row, col) {
+		this.timer.swap();
+		if (this.board.previous == null) {
+			this.timer.start();
+			this.update = setInterval(() => {this.updateTimer()}, 1000);
+		}
+
 		var move = new Move(row = row, col = col);
 		var [bigrow, bigcol] = move.big();
 
@@ -79,6 +87,73 @@ class BigBrainTicTacToe {
 			alert(message);
 		}
 	}
+
+	updateTimer() {
+		console.log('update');
+		var [minutes, seconds] = this.timer.time(this.board.iplayer);
+		var time = minutes + ':' + String(seconds).padStart(2, '0');
+
+		document.getElementById(this.timer.getid()).innerText = time;
+	}
+}
+
+class Timer {
+	constructor(nminutes) {
+		var seconds = 60 * nminutes;
+
+		this.xsec = seconds; // in seconds
+		this.osec = seconds; // in seconds;
+
+		this.playing = 1; // 1 is x | -1 is o | 0 if not playing
+		this.getid();
+	}
+
+	time(player) {
+		if (player == 1) {
+			var minutes = Math.floor(this.xsec / 60);
+			var seconds = this.xsec % 60;
+		} else if (player == -1) {
+			var minutes = Math.floor(this.osec / 60);
+			var seconds = this.osec % 60;
+		}
+
+		return [minutes, seconds];
+	}
+
+	getid() {
+		this.id = this.playing == 1 ? 'x-timer' : 'o-timer';
+		return this.id;
+	}
+
+	swap() {
+		this.playing *= -1;
+	}
+
+	start() {
+		let timer = setInterval(() => {
+			if (this.playing == 1) {
+				this.xsec--;
+				if (this.xsec == 0) {
+					this.stoptimer();
+					alert('X has run out of time!');
+				}
+			} else if (this.playing == -1) {
+				this.osec--;
+				if (this.osec == 0) {
+					this.stoptimer();
+					alert('O has run out of time!');
+				}
+			}
+		}, 1000);
+	}
+
+	stoptimer() {
+		clearInterval(timer);
+	}
 }
 
 var game = new BigBrainTicTacToe();
+
+// var timer = new Timer(3);
+// timer.starttimer();
+// setInterval(() => {console.log(timer.xsec)}, 200);
