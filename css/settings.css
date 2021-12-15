@@ -1,8 +1,32 @@
+:root {
+	--background: #f6f1d1;
+	--cell-background: hsl(51, 54%, 92%);
+	--selected: #dcd9c8;
+	--text-box-background: #f1eedd;
+	--text-box-hover: #ece9d8;
+	--text-box-border: #c3bfa5;
+}
+
 body {
 	zoom: 3;
+	background-color: var(--background);
 }
 
 .settings {
 	text-align: center;
   vertical-align: middle;
+}
+
+input {
+	height: 20px;
+	background-color: var(--text-box-background);
+	border: 1px solid var(--text-box-border);
+	overflow: hidden;
+	transition: 0.3s;
+}
+
+input:hover {
+	background: rgba(0, 0, 0, 0.04);
+	box-shadow: inset 0 -1px 0 rgb(0 0 0 / 50%);
+	background-color: var(--text-box-hover);
 }
