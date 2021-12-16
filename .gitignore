@@ -6,3 +6,4 @@ old/
 delete.*
 *.pyc
 .vscode/
+*.py

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@200;500&display=swap');
+
 :root {
 	--dark-blue: rgb(63, 160, 191);
 	--light-blue: rgb(173, 216, 230);
@@ -13,7 +15,7 @@ body {
 	padding-left: 50px;
 	padding-right: 50px;
 	background-color: var(--background);
-	font-family: Nunito Calibri;
+	font-family: Nunito, Calibri;
 }
 
 #bbttt {
@@ -36,13 +38,13 @@ body {
 }
 
 .square {
-	width: min(9vh, 9vw);
-	height: min(9vh, 9vw);
+	width: min(8.5vh, 9vw);
+	height: min(8.5vh, 9vw);
 	border: 1px solid black;
 	border-radius: 5px;
 	background-color: var(--cell-background);
 
-	font: 3em;
+	font: 2em;
 }
 
 .dark-blue {
@@ -78,7 +80,7 @@ body {
 }
 
 .timer h1 {
-	font-size: 1.5em;
+	font-size: 1em;
 	font-weight: bold;
 	/* width: fit-content; */
 	padding: 1px;
