@@ -1,3 +1,16 @@
+function deepClone(obj) {
+	if (obj === null || typeof obj !== "object")
+		return obj
+	var props = Object.getOwnPropertyDescriptors(obj)
+	for (var prop in props) {
+		props[prop].value = deepClone(props[prop].value)
+	}
+	return Object.create(
+		Object.getPrototypeOf(obj),
+		props
+	)
+}
+
 class Move {
 	constructor(row, col, bigrow, bigcol, subrow, subcol, iplayer) {
 
@@ -142,15 +155,19 @@ class SubBoard {
 	move(row, col, iplayer) {
 		this.board[row][col] = iplayer;
 	}
+
+	undo(row, col) {
+		this.board[row][col] = null;
+	}
 }
 
 class Board {
-	constructor() {
+	constructor(aiPlayer) {
 		this.value_map = {
 			'-1': 'O',
 			null: '~',
 			1: 'X',
-		}
+		};
 
 		this.board = [
 			[null, null, null],
@@ -164,8 +181,16 @@ class Board {
 			[new SubBoard(), new SubBoard(), new SubBoard()],
 		];
 
+		this.lines = [
+			[[0, 0], [0, 1], [0, 2]], [[0, 2], [1, 1], [2, 0]], [[2, 0], [2, 1], [2, 2]],
+			[[0, 1], [1, 1], [2, 1]], [[0, 0], [1, 1], [2, 2]], [[1, 0], [1, 1], [1, 2]],
+			[[0, 0], [1, 0], [2, 0]], [[0, 2], [1, 2], [2, 2]],
+		];
+
 		this.iplayer = 1;
 		this.previous = null;
+
+		this.aiPlayer = aiPlayer;
 	}
 
 	__repr__() {
@@ -340,8 +365,70 @@ class Board {
 		return true;
 	}
 
-	// undo() {
-	// 	this.previous *= -1;
+	undo() {
+		this.iplayer *= -1;
+
+		var relative = this.previous.relative();
+		var [bigrow, bigcol] = relative[0];
+		var [subrow, subcol] = relative[1];
+
+		this.subboards[bigrow][bigcol].undo(subrow, subcol);
+		this.board[bigrow][bigcol] = null;
+	}
+
+	minimax(depth, player, alpha, beta) {
+		var moves = Array.from(this.possible_moves());
+
+		var score, best_move;
+
+		if (depth == 0 || moves.length == 0) {
+			score = this.getScore();
+
+			return {
+				score: score,
+				move: null,
+			}
+		}
+
+		for (let move of moves) {
+			this.move(move);
+			score = this.minimax(depth + 1, player == 1, alpha, beta).score;
+
+			if (player == this.aiPlayer) {
+				if (score > alpha) {
+					alpha = score;
+					best_move = move;
+				}
+			} else {
+				if (score < beta) {
+					beta = score;
+					best_move = move;
+				}
+			}
+
+			this.undo();
+			if (alpha > beta) {
+				break;
+			}
+		}
+
+		return {
+			score: player == this.aiPlayer ? alpha : beta,
+			move: best_move,
+		};
+	}
+
+	// getScore() {
 
 	// }
+
+	scoreLine(line) {
+		var counter = {
+			X: 0,
+			O: 0,
+			tie: 0,
+		};
+
+		for ()
+	}
 }

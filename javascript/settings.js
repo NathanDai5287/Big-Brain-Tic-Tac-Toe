@@ -8,3 +8,11 @@ document.getElementById('play').addEventListener('click', function() {
 	// alert(url.toString());
 	window.location.href = url.href;
 })
+
+document.getElementById('time').addEventListener('keyup', function(event) {
+	event.preventDefault();
+
+	if (event.key == 'Enter') {
+		document.getElementById('play').click();
+	}
+})

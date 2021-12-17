@@ -16,6 +16,7 @@ body {
 	padding-right: 50px;
 	background-color: var(--background);
 	font-family: Nunito, Calibri;
+	outline: none;
 }
 
 #bbttt {
