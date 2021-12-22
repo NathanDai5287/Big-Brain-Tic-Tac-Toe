@@ -12,7 +12,9 @@ function deepClone(obj) {
 }
 
 class Move {
-	constructor(row, col, bigrow, bigcol, subrow, subcol, iplayer) {
+	// constructor(row, col, bigrow, bigcol, subrow, subcol, iplayer) {
+	constructor(...args) {
+		var row = args[0]; var col = args[1]; var bigrow = args[2]; var bigcol = args[3]; var subrow = args[4]; var subcol = args[5]; var iplayer = args[6];
 
 		var absolute;
 		if (row == undefined || col == undefined) {
@@ -88,6 +90,8 @@ class SubBoard {
 			[null, null, null],
 			[null, null, null],
 		];
+
+		this.score = 0;
 	}
 
 	get(row, col) {
@@ -191,6 +195,7 @@ class Board {
 		this.previous = null;
 
 		this.aiPlayer = aiPlayer;
+		this.score = 0;
 	}
 
 	__repr__() {
@@ -422,13 +427,13 @@ class Board {
 
 	// }
 
-	scoreLine(line) {
-		var counter = {
-			X: 0,
-			O: 0,
-			tie: 0,
-		};
+	// scoreLine(line) {
+		// var counter = {
+			// X: 0,
+			// O: 0,
+			// tie: 0,
+		// };
 
-		for ()
-	}
+		// for ()
+	// }
 }
