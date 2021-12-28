@@ -1,0 +1,105 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@200;500&display=swap');
+
+:root {
+	--dark-blue: rgb(63, 160, 191);
+	--light-blue: rgb(173, 216, 230);
+	--dark-red: rgb(214, 88, 107);
+	--light-red: rgb(255, 182, 193);
+	--background: #f6f1d1;
+	--cell-background: #f6f3e1;
+	--selected: #dcd9c8;
+}
+
+body {
+	overflow: hidden;
+	padding-left: 50px;
+	padding-right: 50px;
+	background-color: var(--background);
+	font-family: Nunito, Calibri;
+	outline: none;
+}
+
+#bbttt {
+	padding: 20px;
+	width: fit-content;
+	margin: 0 auto;
+	padding-top: 0;
+}
+
+.col-sm {
+	margin: 0;
+	flex-grow: 0;
+	flex-wrap: nowrap;
+	padding: 0;
+}
+
+#bbttt.row {
+	flex-wrap: nowrap;
+	width: fit-content;
+}
+
+.square {
+	width: min(8.5vh, 9vw);
+	height: min(8.5vh, 9vw);
+	border: 1px solid black;
+	border-radius: 5px;
+	background-color: var(--cell-background);
+
+	font: 2em;
+}
+
+.dark-blue {
+	background-color: var(--dark-blue);
+}
+
+.light-blue {
+	background-color: var(--light-blue);
+}
+
+.dark-red {
+	background-color: var(--dark-red);
+}
+
+.light-red {
+	background-color: var(--light-red);
+}
+
+.top {
+	border-top: 5px solid black;
+}
+
+.bottom {
+	border-bottom: 5px solid black;
+}
+
+.left {
+	border-left: 5px solid black;
+}
+
+.right {
+	border-right: 5px solid black;
+}
+
+.timer h1 {
+	font-size: 1em;
+	font-weight: bold;
+	/* width: fit-content; */
+	padding: 1px;
+}
+
+.blue {
+	color: rgb(0, 0, 255);
+}
+
+.red {
+	color: rgb(255, 0, 0);
+}
+
+.timer-container {
+	font-size: 2em;
+	padding: 10px;
+}
+
+.selected {
+	background-color: var(--selected);
+}
